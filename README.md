@@ -6,7 +6,7 @@
 
 > [!IMPORTANT]
 > All other models require Goo Engine 4.1.1 or later.
-> Script name must not be changed!
+> Script names must not be changed!
 
 ---
 
@@ -31,6 +31,30 @@ A single File:
 <p align="center">
   <img src="/.Media/Download Tutorial.gif">
 </p>
+
+# Setup your own models! 
+FOLLOW THESE EXACT INSTRUCTIONS if you want to setup your own models using the new setup file.
+1. You NEED to use models from <https://cdn.hoyotoon.com/s/assets>
+2. Install BetterFBX (needs to be 5.2) and Expykit or download the addons in this repository.
+3. Open the goo blend file `Setup File.blend`.
+4. Under the item tab, there should be a panel called "Jideeh Script Runner" with exactly THREE  buttons. Click the **"Better FBX Importer"** and import your model. **THE FBX, MATERIALS, AND TEXTURE HAS TO BE IN THE SAME FOLDER.**
+5. After importing the model, click the 2nd button **"Rig, Outline, Shaders."**
+Check here to see what it does.
+6. **Conditional:** if the model uses the wrong face lightmap/has no face lightmap, use the 2nd panel in the item tab called **"Face Lightmap Switcher"** (If you don't see it, check the scripting tab and run it.) This lets you add or switch lightmaps with one button.
+7. **Optional:** Click **"Jideeh's Setup."**
+
+Credits to the lovely people here who have made the ZZZ setup file. https://discord.com/channels/894925535870865498/1439443691142910077, and credits to @jrdan_ & @starriia for teaching me how to setup models. Give their repositories lots of love! [Star's Repository](<https://github.com/starriia/stars-blend-files>) | [Jordan's Repository](<https://mega.nz/folder/27hnRR6Q#JbVN0z1hKitbKq-6R0dOlg>).
+
+## What the button does:
+* **Better  FBX Importer:** Uses the betterFBX addon and allows you to import game models accurately while optimizing your model.
+* **Rig, Outline, Shaders:** Is the same script that https://discord.com/channels/894925535870865498/1439443691142910077 uses. As the name suggests, this generates the rig, outline, and shaders of the model.
+* **Jideeh's Setup:**  This button lets you setup your blend file for animation renders. This does the following:
+  *  Hides All bone collections except for a few: Arms FK, Legs IK, Face, and Torso
+  * IK-FK for both arms are toggled on
+  * Frame rate is set to 24 fps
+  * Render Region is enabled
+  * Adds a camera with a 1920 x 1080 resolution
+  * Camera Passepartout is set to `.850`
 
 ## Special Thanks
 
