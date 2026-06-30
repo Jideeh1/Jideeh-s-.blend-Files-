@@ -34,9 +34,9 @@ A single File:
 
 ## Special Thanks
 
-- [Mken](https://x.com/Mken_TechArt) | Setup Wizard
 - [festivities](https://github.com/festivities) | Shaders
 - [Melioli](https://github.com/Melioli) | HoyoToon CDN
+- [Poke] | ZZZ Setup
 
 > [!NOTE]
 > You may want to use [DownGit](https://downgit.evecalm.com/#/home) to download individual files that you need instead of cloning the entire repository
