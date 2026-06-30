@@ -11,9 +11,9 @@
 ---
 
 <p align="center">
-    <a href="https://github.com/starriia/stars-blend-files/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/starriia/stars-blend-files?style=for-the-badge"></a>
+    <a href="https://github.com/Jideeh1/Jideeh-.blend-Files-/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/Jideeh1/Jideeh-.blend-Files-?style=for-the-badge"></a>
     <a href="https://discord.gg/85rP9SpAkF"><img alt="Discord" src="https://img.shields.io/discord/894925535870865498?style=for-the-badge"></a>
-    <a href="https://github.com/starriia/stars-blend-files/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/starriia/stars-blend-files?style=for-the-badge"></a>
+    <a href="https://github.com/Jideeh1/Jideeh-.blend-Files-/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/Jideeh1/Jideeh-.blend-Files-?style=for-the-badge"></a>
 </p>
 
 ---
