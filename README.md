@@ -35,9 +35,7 @@ A single File:
 ## Special Thanks
 
 - [Mken](https://x.com/Mken_TechArt) | Setup Wizard
-- [fnoji](https://x.com/fnoji) | Isaac's face rig
 - [festivities](https://github.com/festivities) | Shaders
-- [katboi01](https://github.com/katboi01) | Umaviewer
 - [Melioli](https://github.com/Melioli) | HoyoToon CDN
 
 > [!NOTE]
