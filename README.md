@@ -1,7 +1,7 @@
 # Jideeh's `.blend` Files!
 
 <p align="center">
-  <img src="/.Media/Thumbnail.png.png">
+  <img src="/.Media/Thumbnail.png">
 </p>
 
 > [!IMPORTANT]
