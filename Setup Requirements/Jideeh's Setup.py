@@ -58,7 +58,13 @@ common_arm_property_bones = [
 
 extra_fx_modifier_name = "Extra FX"
 extra_fx_node_tree_name = "Extra FX Geonode"
-face_shadow_input_name = "face shadow(off/on)"
+
+extra_fx_slider_values = {
+    "blend(Off/On)": 0.0,
+    "face shadow(Off/On)": 1.0,
+    "shadowsharpness": 1.090,
+}
+
 combine_uv_node_name = "combine uv"
 combine_uv_invert_input_name = "invert"
 
@@ -265,21 +271,21 @@ def modifier_matches_extra_fx(modifier):
 
     return False
 
-def get_socket_value_for_type(socket_type):
+def get_value_for_socket_type(socket_type, requested_value):
     if socket_type in {"NodeSocketFloat", "NodeSocketFloatFactor", "NodeSocketFloatPercentage", "NodeSocketFloatDistance", "NodeSocketFloatAngle", "NodeSocketFloatTime", "NodeSocketFloatTimeAbsolute"}:
-        return 1.0
+        return float(requested_value)
 
     if socket_type == "NodeSocketBool":
-        return True
+        return bool(requested_value)
 
     if socket_type in {"NodeSocketInt", "NodeSocketIntFactor", "NodeSocketIntPercentage"}:
-        return 1
+        return int(round(float(requested_value)))
 
-    return 1.0
+    return float(requested_value)
 
-def get_face_shadow_socket_items(node_group):
+def get_extra_fx_socket_items(node_group, input_name):
     socket_items = []
-    target_name = normalize_name(face_shadow_input_name)
+    target_name = normalize_name(input_name)
 
     if hasattr(node_group, "interface") and hasattr(node_group.interface, "items_tree"):
         for item in node_group.interface.items_tree:
@@ -308,19 +314,19 @@ def get_face_shadow_socket_items(node_group):
 
     return socket_items
 
-def set_face_shadow_on_modifier(modifier):
+def set_extra_fx_slider_on_modifier(modifier, input_name, requested_value):
     if modifier.node_group is None:
         return False, []
 
     updated = []
-    socket_items = get_face_shadow_socket_items(modifier.node_group)
+    socket_items = get_extra_fx_socket_items(modifier.node_group, input_name)
 
     for identifier, socket_name, socket_type in socket_items:
-        value = get_socket_value_for_type(socket_type)
+        value = get_value_for_socket_type(socket_type, requested_value)
 
         try:
             modifier[identifier] = value
-            updated.append(f"{identifier} = {value}")
+            updated.append(f"{socket_name} -> {identifier} = {value}")
         except Exception as error:
             print(f"Could not set {socket_name} using {identifier}: {error}")
 
@@ -340,6 +346,20 @@ def set_face_shadow_on_modifier(modifier):
         pass
 
     return len(updated) > 0, updated
+
+def set_extra_fx_sliders_on_modifier(modifier):
+    updated = []
+    missing = []
+
+    for input_name, requested_value in extra_fx_slider_values.items():
+        was_updated, updates = set_extra_fx_slider_on_modifier(modifier, input_name, requested_value)
+
+        if was_updated:
+            updated.extend(updates)
+        else:
+            missing.append(input_name)
+
+    return len(updated) > 0, updated, missing
 
 def print_modifier_debug_info(obj, modifier):
     print("Debug info for Geometry Nodes modifier:")
@@ -377,10 +397,10 @@ def print_modifier_debug_info(obj, modifier):
             socket_type = getattr(socket, "bl_socket_idname", "")
             print(f"{index} | {socket_name} | {socket_identifier} | {socket_type}")
 
-def enable_face_shadow_extra_fx():
+def update_face_extra_fx_sliders():
     face_objects_found = []
     matching_modifiers_found = []
-    updated_face_shadow = []
+    updated_extra_fx_sliders = []
     missing_modifier_objects = []
     missing_input_modifiers = []
 
@@ -398,12 +418,16 @@ def enable_face_shadow_extra_fx():
 
             for modifier in matching_modifiers:
                 matching_modifiers_found.append(f"{obj.name} -> {modifier.name}")
-                updated, updates = set_face_shadow_on_modifier(modifier)
+                updated, updates, missing_inputs = set_extra_fx_sliders_on_modifier(modifier)
 
                 if updated:
-                    updated_face_shadow.append(f"{obj.name} -> {modifier.name} -> {', '.join(updates)}")
-                else:
-                    missing_input_modifiers.append(f"{obj.name} -> {modifier.name}")
+                    for update in updates:
+                        updated_extra_fx_sliders.append(f"{obj.name} -> {modifier.name} -> {update}")
+
+                if missing_inputs:
+                    missing_input_modifiers.append(f"{obj.name} -> {modifier.name} -> missing: {', '.join(missing_inputs)}")
+
+                if missing_inputs:
                     print_modifier_debug_info(obj, modifier)
 
     try:
@@ -411,7 +435,7 @@ def enable_face_shadow_extra_fx():
     except Exception:
         pass
 
-    return face_objects_found, matching_modifiers_found, updated_face_shadow, missing_modifier_objects, missing_input_modifiers
+    return face_objects_found, matching_modifiers_found, updated_extra_fx_sliders, missing_modifier_objects, missing_input_modifiers
 
 def node_matches_combine_uv(node):
     target_name = normalize_name(combine_uv_node_name)
@@ -624,7 +648,7 @@ scene.render.resolution_percentage = 100
 camera_obj = add_camera_to_scene_collection()
 
 outline_updated_objects, outline_missing_modifier_objects, body_objects_found = disable_body_outline_modifier()
-face_objects_found, extra_fx_modifiers_found, face_shadow_updated_modifiers, face_missing_modifier_objects, face_missing_input_modifiers = enable_face_shadow_extra_fx()
+face_objects_found, extra_fx_modifiers_found, extra_fx_sliders_updated, face_missing_modifier_objects, face_missing_input_modifiers = update_face_extra_fx_sliders()
 body_material_objects_found, body_materials_checked, combine_uv_nodes_found, combine_uv_invert_updated, body_missing_material_objects, body_missing_node_materials, combine_uv_missing_invert_inputs = set_body_material_combine_uv_invert_to_zero()
 
 armature = armature_obj.data
@@ -716,12 +740,12 @@ if extra_fx_modifiers_found:
 else:
     print("No matching Extra FX Geonode modifier was found on any _face or _Face mesh.")
 
-if face_shadow_updated_modifiers:
-    print("face shadow(off/on) was set on:")
-    for modifier_name in face_shadow_updated_modifiers:
-        print(modifier_name)
+if extra_fx_sliders_updated:
+    print("Extra FX sliders updated:")
+    for update in extra_fx_sliders_updated:
+        print(update)
 else:
-    print("face shadow(off/on) was not updated on any matching Extra FX Geonode modifier.")
+    print("No Extra FX sliders were updated.")
 
 if face_missing_modifier_objects:
     print("These _face or _Face meshes did not have the matching Extra FX Geonode modifier:")
@@ -729,7 +753,7 @@ if face_missing_modifier_objects:
         print(object_name)
 
 if face_missing_input_modifiers:
-    print("These matching Extra FX Geonode modifiers did not expose a face shadow(off/on) input:")
+    print("These matching Extra FX Geonode modifiers were missing one or more target sliders:")
     for modifier_name in face_missing_input_modifiers:
         print(modifier_name)
 
@@ -781,4 +805,5 @@ print("Render Region enabled.")
 print("Resolution set to 1920 x 1080.")
 print("Camera added or reused in the scene collection.")
 print("Camera location, rotation, and passepartout updated.")
+print("Face Extra FX sliders updated.")
 print("Body material Combine UV invert sliders updated.")
