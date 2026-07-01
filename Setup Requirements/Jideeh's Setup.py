@@ -68,6 +68,9 @@ extra_fx_slider_values = {
 combine_uv_node_name = "combine uv"
 combine_uv_invert_input_name = "invert"
 
+light_direction_location = (0.520026, -0.017764, 1.5321)
+light_direction_rotation_degrees = (303.617, -91.7351, -269.386)
+
 def normalize_name(name):
     return "".join(character.lower() for character in str(name) if character.isalnum())
 
@@ -102,6 +105,42 @@ def is_body_1_mesh_object(obj):
     base_name = strip_blender_numeric_suffix(obj.name).lower()
 
     return base_name.endswith("_body_1")
+
+def is_light_direction_object(obj):
+    object_name = strip_blender_numeric_suffix(obj.name).lower()
+    data_name = ""
+
+    if obj.data is not None:
+        data_name = strip_blender_numeric_suffix(obj.data.name).lower()
+
+    if object_name.endswith(" light direction"):
+        return True
+
+    if data_name.endswith(" light direction"):
+        return True
+
+    return False
+
+def update_light_direction_objects():
+    updated_objects = []
+
+    for obj in bpy.data.objects:
+        if is_light_direction_object(obj):
+            obj.location = light_direction_location
+            obj.rotation_mode = "XYZ"
+            obj.rotation_euler = (
+                math.radians(light_direction_rotation_degrees[0]),
+                math.radians(light_direction_rotation_degrees[1]),
+                math.radians(light_direction_rotation_degrees[2]),
+            )
+            updated_objects.append(obj.name)
+
+    try:
+        bpy.context.view_layer.update()
+    except Exception:
+        pass
+
+    return updated_objects
 
 def is_metarig_object(obj):
     if obj.type != "ARMATURE":
@@ -646,6 +685,7 @@ scene.render.resolution_y = 1080
 scene.render.resolution_percentage = 100
 
 camera_obj = add_camera_to_scene_collection()
+updated_light_direction_objects = update_light_direction_objects()
 
 outline_updated_objects, outline_missing_modifier_objects, body_objects_found = disable_body_outline_modifier()
 face_objects_found, extra_fx_modifiers_found, extra_fx_sliders_updated, face_missing_modifier_objects, face_missing_input_modifiers = update_face_extra_fx_sliders()
@@ -694,6 +734,13 @@ if hidden_head_direction_objects:
         print(object_name)
 else:
     print("No Head Direction objects found.")
+
+if updated_light_direction_objects:
+    print("Light Direction objects updated:")
+    for object_name in updated_light_direction_objects:
+        print(object_name)
+else:
+    print("No object or data ending with Light Direction was found.")
 
 if missing_collections:
     print("These bone collections were not found:")
@@ -805,5 +852,6 @@ print("Render Region enabled.")
 print("Resolution set to 1920 x 1080.")
 print("Camera added or reused in the scene collection.")
 print("Camera location, rotation, and passepartout updated.")
+print("Light Direction location and rotation updated.")
 print("Face Extra FX sliders updated.")
 print("Body material Combine UV invert sliders updated.")
